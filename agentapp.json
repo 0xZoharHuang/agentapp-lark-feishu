@@ -7,8 +7,10 @@
   "version": "0.1.0",
   "license": "MIT",
   "source": {
-    "type": "local"
+    "type": "git",
+    "url": "https://github.com/0xZoharHuang/agentapp-lark-feishu"
   },
+  "repository": "https://github.com/0xZoharHuang/agentapp-lark-feishu",
   "references": [
     {
       "id": "official-cli",
