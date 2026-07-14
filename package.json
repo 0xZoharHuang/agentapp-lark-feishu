@@ -7,15 +7,17 @@
   "description": "Thin Lark/Feishu AgentApp for the official lark-cli.",
   "files": [
     "agentapp.json",
-    "skills",
     "references",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
     "test": "node --test tests/*.test.mjs",
-    "test:protocol": "node ../agentapp-protocol/bin/agentapp.mjs validate .",
+    "test:protocol": "agentapp validate .",
     "check": "npm run test && npm run test:protocol"
+  },
+  "devDependencies": {
+    "@agentapp/protocol": "git+https://github.com/0xZoharHuang/agentapp-protocol.git#2498bf9fc344e12386b1dcb6a0a370c42321ba8e"
   },
   "engines": {
     "node": ">=20"

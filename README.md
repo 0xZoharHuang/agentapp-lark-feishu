@@ -1,18 +1,19 @@
 # Lark / Feishu AgentApp
 
-Thin AgentApp for the official
-[`lark-cli`](https://github.com/larksuite/cli).
+Independent third-party AgentApp package for the official
+[`lark-cli`](https://github.com/larksuite/cli). This package is maintained
+separately from the upstream CLI.
 
-This package does not wrap Lark APIs. It gives an agent a portable capability
-entrypoint for discovering and using `lark-cli`, including the CLI's own
-embedded skills, command help, schema introspection, auth flow, JSON envelopes,
-dry-run previews, and risk signals.
+This package does not wrap Lark APIs. Its CLI interface and package references
+point agents to `lark-cli` discovery, including the CLI's own embedded skills,
+command help, schema introspection, auth flow, JSON envelopes, dry-run previews,
+and risk signals.
 
 ## What This Package Contains
 
-- `agentapp.json` for AgentApp 0.2 discovery.
-- One small entrypoint skill: `skills/lark-feishu/SKILL.md`.
+- `agentapp.json` for AgentApp 0.3 discovery.
 - References for official CLI discovery, auth flow, and live validation.
+- No local skills; official domain skills are discovered through `lark-cli`.
 
 It intentionally does not contain runtime-specific browser instructions, a UI
 surface, copied endpoint schemas, a second OAuth implementation, or an MCP

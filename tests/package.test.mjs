@@ -22,13 +22,20 @@ function commandExists(command) {
 
 test("manifest is a thin portable lark-cli AgentApp", () => {
   const manifest = readJson("agentapp.json");
-  assert.equal(manifest.schemaVersion, "agentapp/0.2");
+  assert.equal(manifest.schemaVersion, "agentapp/0.3");
   assert.equal(manifest.id, "lark-feishu");
-  assert.equal(manifest.cli.name, "lark-cli");
-  assert.deepEqual(manifest.runtime.requiredBins, ["lark-cli"]);
-  assert.equal(manifest.runtime.network, true);
-  assert.deepEqual(manifest.auth.modes, ["cli-browser", "oauth"]);
-  assert.equal(Object.hasOwn(manifest, "mcp"), false);
+  assert.equal(manifest.interfaces.length, 1);
+  assert.equal(manifest.interfaces[0].id, "lark-cli");
+  assert.equal(manifest.interfaces[0].kind, "cli");
+  assert.equal(manifest.interfaces[0].discovery.command, "lark-cli");
+  assert.deepEqual(manifest.interfaces[0].requirements.requiredBins, ["lark-cli"]);
+  assert.equal(manifest.interfaces[0].requirements.network, true);
+  assert.equal(manifest.interfaces[0].requirements.requiresUserAccount, true);
+  assert.equal(manifest.interfaces[0].requirements.requiresUserDesktop, true);
+  for (const retired of ["cli", "auth", "runtime", "effects", "mcp", "skills"]) {
+    assert.equal(Object.hasOwn(manifest, retired), false);
+  }
+  assert.equal(Object.hasOwn(manifest.interfaces[0], "requiredSkills"), false);
   assert.equal(Object.hasOwn(manifest, "surfaces"), false);
   assert.equal(Object.hasOwn(manifest, "extensions"), false);
 
@@ -48,24 +55,27 @@ test("manifest is a thin portable lark-cli AgentApp", () => {
   }
 
   for (const reference of manifest.references) {
+    assert.equal(reference.path.startsWith("skills/"), false, reference.path);
     assert.equal(fs.existsSync(path.join(repoRoot, reference.path)), true, reference.path);
   }
 });
 
-test("package keeps one thin entrypoint instead of vendoring upstream skills", () => {
-  const skillDirs = fs
-    .readdirSync(path.join(repoRoot, "skills"), { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name)
-    .sort();
-  assert.deepEqual(skillDirs, ["lark-feishu"]);
+test("package inventory is zero-skill and keeps native discovery guidance", () => {
+  const manifest = readJson("agentapp.json");
+  const packageJson = readJson("package.json");
+  const cli = manifest.interfaces[0];
 
-  const skill = readText("skills/lark-feishu/SKILL.md");
-  assert.match(skill, /lark-cli skills list/);
-  assert.match(skill, /lark-cli skills read/);
-  assert.match(skill, /lark-cli schema/);
-  assert.match(skill, /--no-wait --json/);
-  assert.doesNotMatch(skill, /target=host|target=station|AgentStation|Worksite|Companion/);
+  assert.equal(fs.existsSync(path.join(repoRoot, "skills")), false);
+  assert.deepEqual(packageJson.files, ["agentapp.json", "references", "README.md", "LICENSE"]);
+  assert.deepEqual(manifest.references.map(({ id }) => id), ["official-cli", "auth-flow", "live-validation"]);
+  assert.deepEqual(cli.references, ["official-cli", "auth-flow"]);
+  assert.match(cli.discovery.discoveryHint, /lark-cli skills list/);
+  assert.match(cli.discovery.discoveryHint, /lark-cli skills read/);
+  assert.match(cli.discovery.discoveryHint, /lark-cli schema/);
+
+  const authGuide = readText("references/auth-flow.md");
+  assert.match(authGuide, /--no-wait --json/);
+  assert.doesNotMatch(authGuide, /target=host|target=station|AgentStation|Worksite|Companion/);
 });
 
 test("lark-cli is discoverable and agent-native when installed", (t) => {

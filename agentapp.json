@@ -1,29 +1,15 @@
 {
-  "schemaVersion": "agentapp/0.2",
+  "schemaVersion": "agentapp/0.3",
   "id": "lark-feishu",
   "name": "Lark / Feishu",
-  "description": "Thin Lark/Feishu AgentApp for the official lark-cli. It teaches agents to discover and use the CLI's own commands, schemas, embedded skills, auth flow, and risk signals instead of reimplementing Lark APIs.",
+  "description": "Independent third-party Lark/Feishu AgentApp for the official lark-cli. It teaches agents to discover and use the CLI's own commands, schemas, embedded skills, auth flow, and risk signals instead of reimplementing Lark APIs.",
   "publisher": "AgentApp Lark/Feishu Contributors",
   "version": "0.1.0",
   "license": "MIT",
   "source": {
     "type": "local"
   },
-  "skills": {
-    "roots": [
-      "skills"
-    ],
-    "layout": "recursive/SKILL.md",
-    "skillIdStrategy": "relative-path"
-  },
   "references": [
-    {
-      "id": "lark-feishu-core",
-      "path": "skills/lark-feishu/SKILL.md",
-      "title": "Lark/Feishu operation entrypoint",
-      "description": "Portable guidance for using lark-cli as the authoritative discovery, auth, schema, and execution surface.",
-      "kind": "skill"
-    },
     {
       "id": "official-cli",
       "path": "references/official-cli.md",
@@ -46,33 +32,46 @@
       "kind": "reference"
     }
   ],
-  "cli": {
-    "name": "lark-cli",
-    "installHint": "If lark-cli is missing, inspect the official install guidance with `npx @larksuite/cli@latest install` and then verify with `lark-cli --version`, `lark-cli doctor`, and `lark-cli --help`. Do not silently install or update unless the current user task calls for making the capability usable.",
-    "discoveryHint": "Run `lark-cli --help`, `lark-cli doctor`, `lark-cli whoami`, `lark-cli skills list`, `lark-cli skills read <skill>`, service-specific `lark-cli <domain> --help`, and `lark-cli schema <service.resource.method>` as needed. Prefer shortcuts before typed API commands, and typed API commands before raw `lark-cli api`."
-  },
-  "auth": {
-    "modes": [
-      "cli-browser",
-      "oauth"
-    ],
-    "userDesktopRequired": true,
-    "callbackHint": "Use the CLI-reported authorization URL and continuation instructions as opaque output. For agent mode, prefer `lark-cli auth login --no-wait --json`, let the user complete consent in a browser where their Lark/Feishu account is available, then resume with `lark-cli auth login --device-code <DEVICE_CODE>`. If a CLI path uses localhost callback instead, complete consent only where that callback is reachable."
-  },
-  "runtime": {
-    "requiredBins": [
-      "lark-cli"
-    ],
-    "network": true,
-    "filesystemNeeds": [
-      "lark-cli-profile-config",
-      "os-native-credential-storage"
-    ]
-  },
-  "effects": {
-    "mayUploadFiles": true,
-    "mayCallCloud": true,
-    "mayBill": false,
-    "mayPublishExternally": true
-  }
+  "interfaces": [
+    {
+      "id": "lark-cli",
+      "kind": "cli",
+      "title": "Lark and Feishu CLI",
+      "description": "Official CLI interface for discovering and operating Lark or Feishu messaging, documents, calendars, tasks, approvals, and other services.",
+      "whenToUse": "Use for Lark or Feishu work after discovering the relevant official CLI guidance and inspecting the CLI's current service schema.",
+      "discovery": {
+        "command": "lark-cli",
+        "installHint": "If `lark-cli` is missing, inspect the official install guidance and install it only when the current user task calls for making the capability usable.",
+        "discoveryHint": "Run `lark-cli --help`, `lark-cli doctor`, `lark-cli whoami`, `lark-cli skills list`, `lark-cli skills read <skill>`, service-specific help, and `lark-cli schema <service.resource.method>` as needed."
+      },
+      "requirements": {
+        "requiredBins": [
+          "lark-cli"
+        ],
+        "network": true,
+        "filesystemNeeds": [
+          "lark-cli-profile-config",
+          "os-native-credential-storage"
+        ],
+        "requiresUserAccount": true,
+        "requiresUserDesktop": true,
+        "authDiscovery": "Use the CLI-reported authorization URL and continuation instructions. Prefer the CLI's non-blocking device-code flow when available; for a localhost callback, complete consent in a browser that can reach the listener."
+      },
+      "effects": {
+        "mayReadExternalData": true,
+        "mayModifyExternalData": true,
+        "mayUploadFiles": true,
+        "mayDownloadFiles": true,
+        "maySendCommunications": true,
+        "mayPublishPublicly": true,
+        "mayModifyLocalFiles": true,
+        "mayDeleteOrArchive": true,
+        "notes": "Actual effects depend on the selected Lark service method; inspect its schema and risk metadata before execution."
+      },
+      "references": [
+        "official-cli",
+        "auth-flow"
+      ]
+    }
+  ]
 }
