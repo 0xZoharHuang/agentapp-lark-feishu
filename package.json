@@ -17,7 +17,7 @@
     "check": "npm run test && npm run test:protocol"
   },
   "devDependencies": {
-    "@agentapp/protocol": "github:0xZoharHuang/agentapp-protocol#ffaac96365d996126b4ba342fb97bcd17ecef3f4"
+    "@agentapp/protocol": "github:0xZoharHuang/agentapp-protocol#31dda9818cfd3b0fcb31a0327ba189a53707650b"
   },
   "engines": {
     "node": ">=20"
